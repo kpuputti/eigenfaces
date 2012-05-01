@@ -41,7 +41,8 @@
     Faces.prototype.init = function () {
         var that = this;
         this.fetchCSV(function (response) {
-            var parsed = that.parse(response);
+            that.data = that.parse(response);
+            log('parsed data:', that.data);
         });
     };
 
@@ -54,6 +55,27 @@
 
     Faces.prototype.parse = function (csvText) {
         log('parsing CSV text with length:', csvText.length);
+
+        var chunks = csvText.split('-').map(function (val) {
+            // remove whitespace from the beginning and the end
+            return val.replace(/^\s|\s$/g, '');
+        }).filter(function (val) {
+            // filter out empty values
+            return !!val;
+        });
+
+        log('parsed', chunks.length, 'chunks');
+
+        // parse the matrix data from the chunks
+        var data = chunks.map(function (chunk) {
+            var lines = chunk.split('\n');
+            return lines.map(function (line) {
+                return line.split(',').map(function (num) {
+                    return window.parseInt(num, 10);
+                });
+            });
+        });
+        return data;
     };
 
     window.Faces = Faces;

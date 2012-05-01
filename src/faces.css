@@ -129,13 +129,23 @@ article h1 {
 }
 
 /* Application*/
-canvas {
+.canvas-list li {
+    width: 95px;
+    margin-right: 10px;
+    float: left;
+    text-align: center;
+}
+.canvas-list span {
+    font-size: 14px;
+    margin-bottom: 2px;
+}
+.application canvas {
     background-color: #eee;
 }
-.controls {
-    margin-top: 5px;
+.application .controls {
+    margin-bottom: 5px;
 }
-select {
+.application select {
     margin: 0;
 }
 

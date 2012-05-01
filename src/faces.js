@@ -99,6 +99,11 @@
         }
     };
 
+    Faces.prototype.selectIndex = function (index) {
+        this.drawData(this.data[index], this.canvasOriginal);
+        this.controls.querySelector('.data-selector').selectedIndex = index + 1;
+    };
+
     Faces.prototype.initControls = function () {
         log('initializing controls');
 
@@ -116,23 +121,19 @@
         dataSelector.addEventListener('change', function () {
             var value = window.parseInt(dataSelector.value, 10);
             if (!isNaN(value)) {
-                that.drawData(that.data[value], that.canvasOriginal);
+                that.selectIndex(value);
             }
         }, false);
     };
 
     Faces.prototype.start = function () {
         this.initControls();
-        this.drawData(this.data[0], this.canvasOriginal);
-        this.controls.querySelector('.data-selector').selectedIndex = 0;
 
         var hash = window.location.hash.replace(/^#/, '') || 'application';
-
         window.setTimeout(function () {
             document.body.className = hash;
             window.location.hash = hash;
         }, 500);
-
         window.addEventListener('hashchange', function () {
             document.body.className = window.location.hash.replace(/^#/, '');
         }, false);

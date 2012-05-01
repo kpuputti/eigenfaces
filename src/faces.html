@@ -23,11 +23,26 @@
 
       <article id="application">
         <h1>Application</h1>
-        <canvas class="original" width="95" height="95"></canvas>
+
         <section class="controls">
-          <p>Select dataset:</p>
-          <select class="data-selector" autofocus></select>
+          <p>Selected image:
+            <select class="data-selector" autofocus>
+              <option value="">none</option>
+            </select>
+          </p>
         </section>
+
+        <ul class="canvas-list">
+          <li>
+            <span>Original:</span>
+            <canvas class="original" width="95" height="95"></canvas>
+          </li>
+          <li>
+            <span>Eigenface:</span>
+            <canvas class="eigenface" width="95" height="95"></canvas>
+          </li>
+        </ul>
+
       </article>
 
       <article id="documentation">

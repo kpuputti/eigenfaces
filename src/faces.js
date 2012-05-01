@@ -77,6 +77,27 @@
         return data;
     };
 
+    Faces.prototype.drawDataWithIndex = function (index) {
+        log('drawing data with index:', index);
+
+        // clear canvas
+        this.canvas.width = this.canvas.width;
+
+        var side = 20;
+        var matrix = this.data[index];
+        var row, val;
+        for (var i = 0, len1 = matrix.length; i < len1; ++i) {
+            row = matrix[i];
+            for (var j = 0, len2 = row.length; j < len2; ++j) {
+                val = row[j];
+                this.context.fillStyle = 'rgb(' +
+                    val + ', ' + val + ', ' + val +
+                    ')';
+                this.context.fillRect(j * side, i * side, side, side);
+            }
+        }
+    };
+
     Faces.prototype.initControls = function () {
         log('initializing controls');
 
@@ -93,10 +114,9 @@
         var that = this;
         dataSelector.addEventListener('change', function () {
             var value = window.parseInt(dataSelector.value, 10);
-            if (isNaN(value)) {
-                return;
+            if (!isNaN(value)) {
+                that.drawDataWithIndex(value);
             }
-            log('data selector change to:', value, typeof value);
         }, false);
 
         this.controls.className = '';

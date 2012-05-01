@@ -36,16 +36,43 @@
 
     // Flatten a matrix
     var flatten = function (arr) {
-        var flattened = [];
-        arr.forEach(function (subarr) {
-            flattened.push.apply(flattened, subarr);
+        return arr.reduce(function (a, b) {
+            return a.concat(b);
         });
-        return flattened;
+    };
+
+    // Get the average of the given array
+    var avg = function (arr) {
+        return arr.reduce(function (a, b) {
+            return a + b;
+        }) / arr.length;
+    };
+
+    // Transform a matrix
+    var transform = function (matrix) {
+        if (matrix.length === 0) {
+            return [];
+        }
+        // init new matrix with as many rows as there are columns in
+        // the given matrix
+        var transformed = matrix[0].map(function () {
+            return [];
+        });
+
+        // Transform the matrix values
+        matrix.forEach(function (row, rowIndex) {
+            row.forEach(function (val, colIndex) {
+                transformed[colIndex][rowIndex] = val;
+            });
+        });
+
+        return transformed;
     };
 
     // Constructor function for the Faces prototype
     var Faces = function () {
         this.canvasOriginal = document.querySelector('canvas.original');
+        this.canvasEigenface = document.querySelector('canvas.eigenface');
         this.controls = document.querySelector('.controls');
         this.csvURL = '../data/data.csv';
         this.init();
@@ -55,8 +82,7 @@
     Faces.prototype.init = function () {
         var that = this;
         this.fetchCSV(function (response) {
-            that.data = that.parse(response);
-            that.matrix = that.collectMatrix(that.data);
+            that.imageData = that.parse(response);
             that.start();
         });
     };
@@ -104,8 +130,42 @@
         return matrix;
     };
 
+    Faces.prototype.pca = function (data) {
+        log('PCA for matrix with', data.length, 'rows and',
+            data[0].length, 'columns');
+
+        // a. remove averages from each dimension
+
+        var averages = data.map(function (row) {
+            return avg(row);
+        });
+        var averageData = data.map(function (row, rowIndex) {
+
+            // take out the row average from each cell of the row
+            return row.map(function (cell) {
+                return cell - averages[rowIndex];
+            });
+        });
+
+        // b. calculate covariance matrix
+
+
+
+        // c. calculate the eigenvectors and eigenvalues of the
+        // covariance matrix
+
+
+
+        return {
+            averages: averages,
+            averageData: averageData
+        };
+    };
+
     // Draw the given data to the given canvas
     Faces.prototype.drawData = function (data, canvas) {
+        log('drawing to canvas:', canvas);
+
         // clear canvas
         canvas.width = canvas.width;
         var context = canvas.getContext('2d');
@@ -128,7 +188,8 @@
     // canvas
     Faces.prototype.selectIndex = function (index) {
         log('select image with index:', index);
-        this.drawData(this.data[index], this.canvasOriginal);
+        this.drawData(this.imageData[index], this.canvasOriginal);
+        this.drawData(this.pcaData.averageData[index], this.canvasEigenface);
         this.controls.querySelector('.data-selector').selectedIndex = index + 1;
     };
 
@@ -136,7 +197,7 @@
     Faces.prototype.initControls = function () {
         log('initializing controls');
 
-        var len = this.data.length;
+        var len = this.imageData.length;
         var dataSelector = this.controls.querySelector('.data-selector');
         var option;
         for (var i = 0; i < len; ++i) {
@@ -158,6 +219,7 @@
     // Start the application
     Faces.prototype.start = function () {
         this.initControls();
+        this.pcaData = this.pca(this.collectMatrix(this.imageData));
 
         var hash = window.location.hash.replace(/^#/, '') || 'application';
         window.setTimeout(function () {

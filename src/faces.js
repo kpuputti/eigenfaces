@@ -118,11 +118,12 @@
             }
         }, false);
 
-        this.controls.className = '';
+        document.body.className = '';
     };
 
     Faces.prototype.start = function () {
         this.initControls();
+        this.drawData(this.data[0], this.canvasOriginal);
     };
 
     window.Faces = Faces;

@@ -124,9 +124,11 @@
         this.drawData(this.data[0], this.canvasOriginal);
         this.controls.querySelector('.data-selector').selectedIndex = 0;
 
+        var hash = window.location.hash.replace(/^#/, '') || 'application';
+
         window.setTimeout(function () {
-            document.body.className = 'application';
-            window.location.hash = 'application';
+            document.body.className = hash;
+            window.location.hash = hash;
         }, 500);
 
         window.addEventListener('hashchange', function () {

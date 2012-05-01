@@ -31,7 +31,7 @@
 
     var Faces = function () {
         this.canvasOriginal = document.querySelector('#original');
-        this.controls = document.getElementById('controls');
+        this.controls = document.querySelector('.controls');
         this.csvURL = '../data/data.csv';
         this.init();
     };
@@ -117,14 +117,21 @@
                 that.drawData(that.data[value], that.canvasOriginal);
             }
         }, false);
-
-        document.body.className = '';
     };
 
     Faces.prototype.start = function () {
         this.initControls();
         this.drawData(this.data[0], this.canvasOriginal);
         this.controls.querySelector('.data-selector').selectedIndex = 0;
+
+        window.setTimeout(function () {
+            document.body.className = 'application';
+            window.location.hash = 'application';
+        }, 500);
+
+        window.addEventListener('hashchange', function () {
+            document.body.className = window.location.hash.replace(/^#/, '');
+        }, false);
     };
 
     window.Faces = Faces;

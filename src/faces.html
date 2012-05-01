@@ -7,23 +7,39 @@
   </head>
   <body class="loading">
 
-    <p id="loading-indicator">loading...</p>
+    <div id="loading-indicator"></div>
 
-    <section id="content">
+    <div id="container">
+
       <h1>Eigenfaces</h1>
+
+      <nav>
+        <ul>
+          <li><a href="#application">Application</a></li>
+          <li><a href="#documentation">Documentation</a></li>
+        </ul>
+      </nav>
       <p class="author">Kimmo Puputti, 2012</p>
-      <canvas id="original" width="95" height="95"></canvas>
-      <section id="controls" class="hidden">
-        <p>Select dataset:</p>
-        <select class="data-selector" autofocus></select>
-      </section>
-    </section>
+
+      <article id="application">
+        <h1>Application</h1>
+        <canvas id="original" width="95" height="95"></canvas>
+        <section class="controls">
+          <p>Select dataset:</p>
+          <select class="data-selector" autofocus></select>
+        </section>
+      </article>
+
+      <article id="documentation">
+        <h1>Documentation</h1>
+        <p>documentation here</p>
+      </article>
+
+    </div>
 
     <script src="faces.js"></script>
     <script>
-      window.onload = function () {
-        window.faces = new Faces();
-      };
+      window.onload = function () { window.faces = new Faces(); };
     </script>
   </body>
 </html>

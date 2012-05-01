@@ -1,7 +1,7 @@
 /*jslint white: true, devel: true, onevar: false, undef: true, nomen: false,
   regexp: true, plusplus: false, bitwise: true, newcap: true, maxerr: 50,
   indent: 4 */
-/*global window: false, document: false, XMLHttpRequest: false  */
+/*global window: false, document: false, XMLHttpRequest: false, algebralib: false */
 
 (function () {
 
@@ -32,92 +32,6 @@
             }
         };
         req.send();
-    };
-
-    // Calculate the sum of the item in the given array
-    var sum = function (arr) {
-        return arr.reduce(function (a, b) {
-            return a + b;
-        });
-    };
-
-    // Flatten a matrix
-    var flatten = function (arr) {
-        return arr.reduce(function (a, b) {
-            return a.concat(b);
-        });
-    };
-
-    // Get the average of the given array
-    var avg = function (arr) {
-        return arr.reduce(function (a, b) {
-            return a + b;
-        }) / arr.length;
-    };
-
-    // Create a matrix with the given dimensions with zero in each
-    // cell
-    var getZeroMatrix = function (rows, cols) {
-        var matrix = [];
-        for (var i = 0; i < rows; ++i) {
-            matrix[i] = [];
-            for (var j = 0; j < cols; ++j) {
-                matrix[i][j] = 0;
-            }
-        }
-        return matrix;
-    };
-
-    // Transform a matrix
-    var transform = function (matrix) {
-        // init new matrix with as many rows as there are columns in
-        // the given matrix
-        var transformed = getZeroMatrix(matrix[0].length, matrix.length);
-
-        // Transform the matrix values
-        matrix.forEach(function (row, rowIndex) {
-            row.forEach(function (val, colIndex) {
-                transformed[colIndex][rowIndex] = val;
-            });
-        });
-
-        return transformed;
-    };
-
-    // Calculate the dot product of the given vectors
-    var dotProduct = function (vector1, vector2) {
-        if (vector1.length !== vector2.length) {
-            throw new Error('Cannot calculate dot product with vectors of different length.');
-        }
-        return sum(vector1.map(function (val, index) {
-            return val * vector2[index];
-        }));
-    };
-
-    // Get the nth column of the given matrix
-    var getMatrixColumn = function (matrix, n) {
-        var column = [];
-        matrix.forEach(function (row) {
-            column.push(row[n]);
-        });
-        return column;
-    };
-
-    // Multiply the given matrices
-    var multiply = function (matrix1, matrix2) {
-        if (matrix1.length === 0 || matrix1[0].length !== matrix2.length) {
-            throw new Error('Cannot multiply matrices with the given dimensions.');
-        }
-        var result = getZeroMatrix(matrix1.length, matrix2[0].length);
-
-        var row;
-        for (var i = 0, len1 = result.length; i < len1; ++i) {
-            for (var j = 0, len2 = result[i].length; j < len2; ++j) {
-                result[i][j] = dotProduct(matrix1[i], getMatrixColumn(matrix2, j));
-            }
-        }
-
-        return result;
     };
 
     // Constructor function for the Faces prototype
@@ -176,31 +90,42 @@
     Faces.prototype.collectMatrix = function (data) {
         var matrix = [];
         data.forEach(function (chunk) {
-            matrix.push(flatten(chunk));
+            matrix.push(algebralib.flatten(chunk));
         });
         return matrix;
     };
 
     Faces.prototype.pca = function (data) {
-        log('PCA for matrix with', data.length, 'rows and',
-            data[0].length, 'columns');
+        var numRows = data.length;
+        var numColumns = data[0].length;
+
+        log('PCA for matrix with', numRows, 'rows and', numColumns, 'columns');
 
         // a. remove averages from each dimension
 
-        var averages = data.map(function (row) {
-            return avg(row);
-        });
-        var averageData = data.map(function (row, rowIndex) {
+        // TODO: check this?!
 
+        data = algebralib.transpose(data);
+        var averages = data.map(function (row) {
+            return algebralib.avg(row);
+        });
+        var averageMatrix = data.map(function (row, rowIndex) {
             // take out the row average from each cell of the row
             return row.map(function (cell) {
                 return cell - averages[rowIndex];
             });
         });
+        averageMatrix = algebralib.transpose(averageMatrix);
 
         // b. calculate covariance matrix
 
-
+        var multiplied = algebralib.multiply(averageMatrix,
+                                             algebralib.transpose(averageMatrix));
+        var covmatrix = multiplied.map(function (row) {
+            return row.map(function (cell) {
+                return cell / numRows;
+            });
+        });
 
         // c. calculate the eigenvectors and eigenvalues of the
         // covariance matrix
@@ -209,7 +134,8 @@
 
         return {
             averages: averages,
-            averageData: averageData
+            averageMatrix: averageMatrix,
+            covmatrix: covmatrix
         };
     };
 
@@ -240,7 +166,7 @@
     Faces.prototype.selectIndex = function (index) {
         log('select image with index:', index);
         this.drawData(this.imageData[index], this.canvasOriginal);
-        this.drawData(this.pcaData.averageData[index], this.canvasEigenface);
+        //this.drawData(this.pcaData.averageData[index], this.canvasEigenface);
         this.controls.querySelector('.data-selector').selectedIndex = index + 1;
     };
 
@@ -270,13 +196,11 @@
     // Start the application
     Faces.prototype.start = function () {
         this.initControls();
-        this.pcaData = this.pca(this.collectMatrix(this.imageData));
+        this.pcaData = this.pca(algebralib.transpose(this.collectMatrix(this.imageData)));
 
         var hash = window.location.hash.replace(/^#/, '') || 'application';
-        window.setTimeout(function () {
-            document.body.className = hash;
-            window.location.hash = hash;
-        }, 200);
+        document.body.className = hash;
+        window.location.hash = hash;
         window.addEventListener('hashchange', function () {
             document.body.className = window.location.hash.replace(/^#/, '');
         }, false);

@@ -7,12 +7,17 @@
   </head>
   <body>
     <h1>Eigenfaces</h1>
+    <p class="author">Kimmo Puputti, 2012</p>
     <canvas></canvas>
+    <section id="controls" class="hidden">
+      <select class="data-selector">
+        <option value="" selected>Select data set:</option>
+      </select>
+    </section>
     <script src="faces.js"></script>
     <script>
       window.onload = function () {
-        var canvas = document.querySelector('canvas');
-        var faces = new Faces(canvas, '../data/data.csv');
+        window.faces = new Faces();
       };
     </script>
   </body>

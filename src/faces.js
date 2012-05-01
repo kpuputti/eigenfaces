@@ -29,12 +29,11 @@
         req.send();
     };
 
-    var Faces = function (canvas, csvURL) {
-        log('initialize Faces instance with canvas:', canvas,
-            'and CSV URL:', csvURL);
-        this.canvas = canvas;
-        this.context = canvas.getContext('2d');
-        this.csvURL = csvURL;
+    var Faces = function () {
+        this.canvas = document.querySelector('canvas');
+        this.context = this.canvas.getContext('2d');
+        this.controls = document.getElementById('controls');
+        this.csvURL = '../data/data.csv';
         this.init();
     };
 
@@ -42,7 +41,7 @@
         var that = this;
         this.fetchCSV(function (response) {
             that.data = that.parse(response);
-            log('parsed data:', that.data);
+            that.start();
         });
     };
 
@@ -76,6 +75,35 @@
             });
         });
         return data;
+    };
+
+    Faces.prototype.initControls = function () {
+        log('initializing controls');
+
+        var len = this.data.length;
+        var dataSelector = this.controls.querySelector('.data-selector');
+        var option;
+        for (var i = 0; i < len; ++i) {
+            option = document.createElement('option');
+            option.value = i;
+            option.innerHTML = i;
+            dataSelector.appendChild(option);
+        }
+
+        var that = this;
+        dataSelector.addEventListener('change', function () {
+            var value = window.parseInt(dataSelector.value, 10);
+            if (isNaN(value)) {
+                return;
+            }
+            log('data selector change to:', value, typeof value);
+        }, false);
+
+        this.controls.className = '';
+    };
+
+    Faces.prototype.start = function () {
+        this.initControls();
     };
 
     window.Faces = Faces;

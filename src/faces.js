@@ -5,6 +5,8 @@
 
 (function () {
 
+    'use strict';
+
     // Helper function for safe logging
     var log = function () {
         if (window.console && console.log && console.log.apply) {

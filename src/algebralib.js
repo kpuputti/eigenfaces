@@ -4,6 +4,9 @@
 /*global window: false */
 
 (function () {
+
+    'use strict';
+
     var lib = {};
 
     // Calculate the sum of the array items

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Eigenfaces</title>
+    <link rel="stylesheet" href="faces.css">
+  </head>
+  <body>
+    <h1>Eigenfaces</h1>
+    <canvas></canvas>
+    <script src="faces.js"></script>
+    <script>
+      window.onload = function () {
+        var canvas = document.querySelector('canvas');
+        var faces = new Faces(canvas);
+      };
+    </script>
+  </body>
+</html>

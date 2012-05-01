@@ -124,6 +124,7 @@
     Faces.prototype.start = function () {
         this.initControls();
         this.drawData(this.data[0], this.canvasOriginal);
+        this.controls.querySelector('.data-selector').selectedIndex = 0;
     };
 
     window.Faces = Faces;

@@ -5,6 +5,7 @@
 
 (function () {
 
+    // Helper function for safe logging
     var log = function () {
         if (window.console && console.log && console.log.apply) {
             var args = Array.prototype.slice.call(arguments);
@@ -13,10 +14,12 @@
         }
     };
 
+    // Get the XHR object
     var getXHR = function () {
         return new XMLHttpRequest();
     };
 
+    // Fetch the contents of the given URL
     var fetch = function (url, callback) {
         log('fetching data from url:', url);
         var req = getXHR();
@@ -31,6 +34,16 @@
         req.send();
     };
 
+    // Flatten a matrix
+    var flatten = function (arr) {
+        var flattened = [];
+        arr.forEach(function (subarr) {
+            flattened.push.apply(flattened, subarr);
+        });
+        return flattened;
+    };
+
+    // Constructor function for the Faces prototype
     var Faces = function () {
         this.canvasOriginal = document.querySelector('canvas.original');
         this.controls = document.querySelector('.controls');
@@ -38,14 +51,17 @@
         this.init();
     };
 
+    // Initialize data for the instance
     Faces.prototype.init = function () {
         var that = this;
         this.fetchCSV(function (response) {
             that.data = that.parse(response);
+            that.matrix = that.collectMatrix(that.data);
             that.start();
         });
     };
 
+    // Fetch CSV data
     Faces.prototype.fetchCSV = function (callback) {
         fetch(this.csvURL, function (response) {
             log('received response:', response.substr(0, 50) + '...');
@@ -53,6 +69,7 @@
         });
     };
 
+    // Parse CSV data into matrices
     Faces.prototype.parse = function (csvText) {
         log('parsing CSV text with length:', csvText.length);
 
@@ -78,9 +95,17 @@
         return data;
     };
 
-    Faces.prototype.drawData = function (data, canvas) {
-        log('drawing data');
+    // Collect a large matrix from the individual data matrices
+    Faces.prototype.collectMatrix = function (data) {
+        var matrix = [];
+        data.forEach(function (chunk) {
+            matrix.push(flatten(chunk));
+        });
+        return matrix;
+    };
 
+    // Draw the given data to the given canvas
+    Faces.prototype.drawData = function (data, canvas) {
         // clear canvas
         canvas.width = canvas.width;
         var context = canvas.getContext('2d');
@@ -99,11 +124,15 @@
         }
     };
 
+    // Select the image with the given index, draws the image to a
+    // canvas
     Faces.prototype.selectIndex = function (index) {
+        log('select image with index:', index);
         this.drawData(this.data[index], this.canvasOriginal);
         this.controls.querySelector('.data-selector').selectedIndex = index + 1;
     };
 
+    // Initialize the application controls
     Faces.prototype.initControls = function () {
         log('initializing controls');
 
@@ -126,6 +155,7 @@
         }, false);
     };
 
+    // Start the application
     Faces.prototype.start = function () {
         this.initControls();
 
@@ -133,11 +163,12 @@
         window.setTimeout(function () {
             document.body.className = hash;
             window.location.hash = hash;
-        }, 500);
+        }, 200);
         window.addEventListener('hashchange', function () {
             document.body.className = window.location.hash.replace(/^#/, '');
         }, false);
     };
 
+    // Expose the Faces prototype to the global scope
     window.Faces = Faces;
 }());

@@ -23,7 +23,7 @@
 
       <article id="application">
         <h1>Application</h1>
-        <canvas id="original" width="95" height="95"></canvas>
+        <canvas class="original" width="95" height="95"></canvas>
         <section class="controls">
           <p>Select dataset:</p>
           <select class="data-selector" autofocus></select>
@@ -39,7 +39,9 @@
 
     <script src="faces.js"></script>
     <script>
-      window.onload = function () { window.faces = new Faces(); };
+      window.onload = function () {
+        window.faces = new Faces();
+      };
     </script>
   </body>
 </html>

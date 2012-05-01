@@ -24,13 +24,15 @@
         req.onreadystatechange = function () {
             if (req.readyState === 4 && req.status === 200) {
                 callback(req.responseText);
+            } else if (req.readyState === 4) {
+                alert('Cannot load data from URL: ' + url);
             }
         };
         req.send();
     };
 
     var Faces = function () {
-        this.canvasOriginal = document.querySelector('#original');
+        this.canvasOriginal = document.querySelector('canvas.original');
         this.controls = document.querySelector('.controls');
         this.csvURL = '../data/data.csv';
         this.init();

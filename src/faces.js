@@ -39,6 +39,7 @@
         this.canvasOriginal = document.querySelector('canvas.original');
         this.canvasEigenface = document.querySelector('canvas.eigenface');
         this.controls = document.querySelector('.controls');
+        this.loadingIndicator = document.getElementById('loading-indicator');
         this.csvURL = '../data/data.csv';
         this.init();
     };
@@ -46,6 +47,7 @@
     // Initialize data for the instance
     Faces.prototype.init = function () {
         var that = this;
+        this.loadingIndicator.innerHTML = 'fetching CSV data...';
         this.fetchCSV(function (response) {
             that.imageData = that.parse(response);
             that.start();
@@ -63,6 +65,7 @@
     // Parse CSV data into matrices
     Faces.prototype.parse = function (csvText) {
         log('parsing CSV text with length:', csvText.length);
+        this.loadingIndicator.innerHTML = 'parsing CSV data...';
 
         var chunks = csvText.split('-').map(function (val) {
             // remove whitespace from the beginning and the end
@@ -196,11 +199,16 @@
     // Start the application
     Faces.prototype.start = function () {
         this.initControls();
+
+        this.loadingIndicator.innerHTML = 'calculating PCA...';
         this.pcaData = this.pca(algebralib.transpose(this.collectMatrix(this.imageData)));
+        this.loadingIndicator.innerHTML = 'done';
 
         var hash = window.location.hash.replace(/^#/, '') || 'application';
-        document.body.className = hash;
-        window.location.hash = hash;
+        window.setTimeout(function () {
+            document.body.className = hash;
+            window.location.hash = hash;
+        }, 200);
         window.addEventListener('hashchange', function () {
             document.body.className = window.location.hash.replace(/^#/, '');
         }, false);

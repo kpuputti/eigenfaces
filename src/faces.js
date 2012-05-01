@@ -77,17 +77,16 @@
         return data;
     };
 
-    Faces.prototype.drawDataWithIndex = function (index) {
-        log('drawing data with index:', index);
+    Faces.prototype.drawData = function (data, canvas) {
+        log('drawing data');
 
         // clear canvas
-        this.canvas.width = this.canvas.width;
+        canvas.width = canvas.width;
 
-        var side = 20;
-        var matrix = this.data[index];
+        var side = canvas.width / data[0].length;
         var row, val;
-        for (var i = 0, len1 = matrix.length; i < len1; ++i) {
-            row = matrix[i];
+        for (var i = 0, len1 = data.length; i < len1; ++i) {
+            row = data[i];
             for (var j = 0, len2 = row.length; j < len2; ++j) {
                 val = row[j];
                 this.context.fillStyle = 'rgb(' +
@@ -115,7 +114,7 @@
         dataSelector.addEventListener('change', function () {
             var value = window.parseInt(dataSelector.value, 10);
             if (!isNaN(value)) {
-                that.drawDataWithIndex(value);
+                that.drawData(that.data[value], that.canvas);
             }
         }, false);
 

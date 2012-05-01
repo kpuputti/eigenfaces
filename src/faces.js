@@ -30,8 +30,7 @@
     };
 
     var Faces = function () {
-        this.canvas = document.querySelector('canvas');
-        this.context = this.canvas.getContext('2d');
+        this.canvasOriginal = document.querySelector('#original');
         this.controls = document.getElementById('controls');
         this.csvURL = '../data/data.csv';
         this.init();
@@ -82,6 +81,7 @@
 
         // clear canvas
         canvas.width = canvas.width;
+        var context = canvas.getContext('2d');
 
         var side = canvas.width / data[0].length;
         var row, val;
@@ -89,10 +89,10 @@
             row = data[i];
             for (var j = 0, len2 = row.length; j < len2; ++j) {
                 val = row[j];
-                this.context.fillStyle = 'rgb(' +
+                context.fillStyle = 'rgb(' +
                     val + ', ' + val + ', ' + val +
                     ')';
-                this.context.fillRect(j * side, i * side, side, side);
+                context.fillRect(j * side, i * side, side, side);
             }
         }
     };
@@ -114,7 +114,7 @@
         dataSelector.addEventListener('change', function () {
             var value = window.parseInt(dataSelector.value, 10);
             if (!isNaN(value)) {
-                that.drawData(that.data[value], that.canvas);
+                that.drawData(that.data[value], that.canvasOriginal);
             }
         }, false);
 

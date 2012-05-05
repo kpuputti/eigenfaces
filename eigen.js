@@ -10,6 +10,8 @@ var exec = require('child_process').exec;
 
 var PWD = process.env.PWD;
 var CSV_PATH = PWD + '/data/data.csv';
+var EIGENVALUES_FILE = PWD + '/data/eigenvalues.json';
+
 var start = Date.now();
 
 var log = function (s) {
@@ -122,7 +124,7 @@ var savePCAData = function (matrix, callback) {
         // c. calculate the eigenvectors and eigenvalues of the
         // covariance matrix
 
-        var eigfile = PWD + '/data/eigenvalues.json';
+        var eigfile = EIGENVALUES_FILE;
         saveEigenvalues(covMatrixFile, eigfile, function () {
             log('saved eigenvalues to file: ' + eigfile);
             callback();

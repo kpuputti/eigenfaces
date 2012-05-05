@@ -71,11 +71,24 @@ nav a {
     border-bottom: 1px solid #fff;
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
+
     -webkit-user-select: none;
     -khtml-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+
+    -webkit-transition-property: background-color;
+    -moz-transition-property: background-color;
+    -ms-transition-property: background-color;
+    -o-transition-property: background-color;
+    transition-property: background-color;
+
+    -webkit-transition-duration: 0.3s;
+    -moz-transition-duration: 0.3s;
+    -ms-transition-duration: 0.3s;
+    -o-transition-duration: 0.3s;
+    transition-duration: 0.3s;
 }
 nav a:hover {
     background-color: #eee;

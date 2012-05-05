@@ -27,7 +27,7 @@
         var req = getXHR();
         req.open('GET', url, false);
         req.onreadystatechange = function () {
-            if (req.readyState === 4 && req.status === 200) {
+            if (req.readyState === 4 && (req.status === 200 || req.status === 0)) {
                 callback(req.responseText);
             } else if (req.readyState === 4) {
                 alert('Cannot load data from URL: ' + url);

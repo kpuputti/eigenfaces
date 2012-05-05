@@ -70,6 +70,9 @@ var calculateEigenvalues = function (covmatrixFile, callback) {
 
 var writeCovMatrix = function (matrix, callback) {
     log('calculating covmatrix');
+
+    // TODO: some missing pieces here
+
     var covmatrix = matrix.x(matrix.transpose());
     var covdims = covmatrix.dimensions();
     log('covmatrix with ' + covdims.rows + ' rows and ' +

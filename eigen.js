@@ -73,8 +73,9 @@ var writeCovMatrix = function (matrix, callback) {
     log('covmatrix with ' + covdims.rows + ' rows and ' +
         covdims.cols + ' columns');
 
-    log('writing output json file');
     var outfile = PWD + '/tmp/covmatrix.json';
+    log('writing output json file: ' + outfile);
+
     var json = JSON.stringify(covmatrix.toArray());
     fs.writeFile(outfile, json, function (err) {
         if (err) {
@@ -123,6 +124,7 @@ var savePCAData = function (matrix, callback) {
 
         var eigfile = PWD + '/data/eigenvalues.json';
         saveEigenvalues(covMatrixFile, eigfile, function () {
+            log('saved eigenvalues to file: ' + eigfile);
             callback();
         });
     });

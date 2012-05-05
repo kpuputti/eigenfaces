@@ -111,7 +111,7 @@ var saveEigenvalues = function (covMatrixFile, eigfile, callback) {
     });
 };
 
-var savePCAData = function (matrix) {
+var savePCAData = function (matrix, callback) {
     // a. remove averages from each dimension
     var avgMatrix = getAvgMatrix(matrix);
 
@@ -123,12 +123,12 @@ var savePCAData = function (matrix) {
 
         var eigfile = PWD + '/data/eigenvalues.json';
         saveEigenvalues(covMatrixFile, eigfile, function () {
-            end();
+            callback();
         });
     });
 };
 
-var processCSV = function (csv) {
+var processCSV = function (csv, callback) {
     log('read ' + csv.length + ' chars of data');
     var matrix = getMatrix(csv.toString());
     var dims = matrix.dimensions();
@@ -136,7 +136,7 @@ var processCSV = function (csv) {
         dims.rows + ' rows and ' +
         dims.cols + ' columns');
 
-    savePCAData(matrix);
+    savePCAData(matrix, callback);
 };
 
 var main = function () {
@@ -145,7 +145,9 @@ var main = function () {
         if (err) {
             throw err;
         }
-        processCSV(csv);
+        processCSV(csv, function () {
+            end();
+        });
     });
 };
 main();

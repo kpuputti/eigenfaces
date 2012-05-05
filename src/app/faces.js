@@ -1,7 +1,8 @@
 /*jslint white: true, devel: true, onevar: false, undef: true, nomen: false,
   regexp: true, plusplus: false, bitwise: true, newcap: true, maxerr: 50,
   indent: 4 */
-/*global window: false, document: false, XMLHttpRequest: false, algebralib: false */
+/*global window: false, document: false, XMLHttpRequest: false,
+  algebralib: false, numeric: false */
 
 (function () {
 
@@ -11,7 +12,7 @@
     var log = function () {
         if (window.console && console.log && console.log.apply) {
             var args = Array.prototype.slice.call(arguments);
-            args.unshift('Faces:');
+            args.unshift(Date.now() + ' Faces:');
             console.log.apply(console, args);
         }
     };
@@ -38,6 +39,7 @@
 
     // Constructor function for the Faces prototype
     var Faces = function () {
+        this.startTime = Date.now();
         this.canvasOriginal = document.querySelector('canvas.original');
         this.canvasEigenface = document.querySelector('canvas.eigenface');
         this.controls = document.querySelector('.controls');
@@ -135,12 +137,15 @@
         // c. calculate the eigenvectors and eigenvalues of the
         // covariance matrix
 
-
+        log('calculating eigenvalues');
+        var eig;// = numeric.eig(covmatrix);
+        log('eigenvalues calculated');
 
         return {
             averages: averages,
             averageMatrix: averageMatrix,
-            covmatrix: covmatrix
+            covmatrix: covmatrix,
+            eig: eig
         };
     };
 
@@ -207,13 +212,14 @@
         this.loadingIndicator.innerHTML = 'done';
 
         var hash = window.location.hash.replace(/^#/, '') || 'application';
-        window.setTimeout(function () {
-            document.body.className = hash;
-            window.location.hash = hash;
-        }, 200);
+        document.body.className = hash;
+        window.location.hash = hash;
         window.addEventListener('hashchange', function () {
             document.body.className = window.location.hash.replace(/^#/, '');
         }, false);
+
+        var elapsed = Date.now() - this.startTime;
+        log('Faces ready in', elapsed, 'ms');
     };
 
     // Expose the Faces prototype to the global scope

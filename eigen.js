@@ -6,8 +6,10 @@
 var fs = require('fs');
 var sylvester = require('sylvester');
 var underscore = require('underscore');
+var exec = require('child_process').exec;
 
-var CSV_PATH = process.env.PWD + '/data/data.csv';
+var PWD = process.env.PWD;
+var CSV_PATH = PWD + '/data/data.csv';
 var start = Date.now();
 
 var log = function (s) {
@@ -15,6 +17,12 @@ var log = function (s) {
 };
 var end = function () {
     log('ready in ' + (Date.now() - start) + 'ms');
+};
+
+var avg = function (arr) {
+    return arr.reduce(function (a, b) {
+        return a + b;
+    }) / arr.length;
 };
 
 var getMatrix = function (csv) {
@@ -43,7 +51,92 @@ var getMatrix = function (csv) {
         return underscore.flatten(chunk);
     });
     var matrix = sylvester.Matrix.create(scanned);
-    return matrix;
+    return matrix.transpose();
+};
+
+var calculateEigenvalues = function (covmatrixFile, callback) {
+    log('calculating eigenvalues from file: ' + covmatrixFile);
+    var cmd = 'python eigvals.py ' + covmatrixFile;
+    log('running command: ' + cmd);
+    exec(cmd, function (err, stdout, stderr) {
+        if (err) {
+            throw err;
+        }
+        callback(JSON.parse(stdout));
+    });
+};
+
+var writeCovMatrix = function (matrix, callback) {
+    log('calculating covmatrix');
+    var covmatrix = matrix.x(matrix.transpose());
+    var covdims = covmatrix.dimensions();
+    log('covmatrix with ' + covdims.rows + ' rows and ' +
+        covdims.cols + ' columns');
+
+    log('writing output json file');
+    var outfile = PWD + '/tmp/covmatrix.json';
+    var json = JSON.stringify(covmatrix.toArray());
+    fs.writeFile(outfile, json, function (err) {
+        if (err) {
+            throw err;
+        }
+        callback(outfile);
+    });
+};
+
+var getAvgMatrix = function (matrix) {
+    var averages = matrix.toArray().map(function (row) {
+        return avg(row);
+    });
+    var transposed = matrix.transpose().toArray();
+    var avgMatrix = transposed.map(function (row, rowIndex) {
+        // take out the row average from each cell of the row
+        return row.map(function (cell) {
+            return cell - averages[rowIndex];
+        });
+    });
+    return sylvester.Matrix.create(avgMatrix).transpose();
+};
+
+var saveEigenvalues = function (covMatrixFile, eigfile, callback) {
+    calculateEigenvalues(covMatrixFile, function (eigvals) {
+        log('got ' + eigvals.length + ' eigenvalues');
+        var eigData = JSON.stringify(eigvals);
+        fs.writeFile(eigfile, eigData, function (err) {
+            if (err) {
+                throw err;
+            }
+            callback();
+        });
+    });
+};
+
+var savePCAData = function (matrix) {
+    // a. remove averages from each dimension
+    var avgMatrix = getAvgMatrix(matrix);
+
+    // b. calculate covariance matrix
+    writeCovMatrix(avgMatrix, function (covMatrixFile) {
+
+        // c. calculate the eigenvectors and eigenvalues of the
+        // covariance matrix
+
+        var eigfile = PWD + '/data/eigenvalues.json';
+        saveEigenvalues(covMatrixFile, eigfile, function () {
+            end();
+        });
+    });
+};
+
+var processCSV = function (csv) {
+    log('read ' + csv.length + ' chars of data');
+    var matrix = getMatrix(csv.toString());
+    var dims = matrix.dimensions();
+    log('parsed matrix with ' +
+        dims.rows + ' rows and ' +
+        dims.cols + ' columns');
+
+    savePCAData(matrix);
 };
 
 var main = function () {
@@ -52,13 +145,7 @@ var main = function () {
         if (err) {
             throw err;
         }
-        log('read ' + csv.length + ' chars of data');
-        var matrix = getMatrix(csv.toString());
-        var dims = matrix.dimensions();
-        log('parsed matrix with ' +
-            dims.rows + ' rows and ' +
-            dims.cols + ' columns');
-        end();
+        processCSV(csv);
     });
 };
 main();

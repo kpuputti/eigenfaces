@@ -91,14 +91,13 @@ var getAvgMatrix = function (matrix) {
     var averages = matrix.toArray().map(function (row) {
         return avg(row);
     });
-    var transposed = matrix.transpose().toArray();
-    var avgMatrix = transposed.map(function (row, rowIndex) {
+    var avgMatrix = matrix.toArray().map(function (row, rowIndex) {
         // take out the row average from each cell of the row
         return row.map(function (cell) {
             return cell - averages[rowIndex];
         });
     });
-    return sylvester.Matrix.create(avgMatrix).transpose();
+    return sylvester.Matrix.create(avgMatrix);
 };
 
 var saveEigenvalues = function (covMatrixFile, eigfile, callback) {
@@ -116,6 +115,9 @@ var saveEigenvalues = function (covMatrixFile, eigfile, callback) {
 
 var savePCAData = function (matrix, callback) {
     // a. remove averages from each dimension
+
+    // TODO: check this, something weird happening here
+
     var avgMatrix = getAvgMatrix(matrix);
 
     // b. calculate covariance matrix

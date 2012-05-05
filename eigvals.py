@@ -3,9 +3,21 @@ import numpy
 import sys
 
 
+SIDE = 19
+
+
+def normalize(eigvals):
+    minval = min(eigvals)
+    maxval = max(eigvals)
+    diff = maxval - minval
+    return numpy.array([(e - minval) / diff * 255 for e in eigvals])
+
+
 def eigvals_json(data):
     arr = numpy.array(data)
-    return numpy.linalg.eigvals(arr).real.tolist()
+    eigvals = numpy.linalg.eigvals(arr).real
+    vals = normalize(eigvals)
+    return vals.reshape(SIDE, SIDE).tolist()
 
 
 def main(args):

@@ -166,6 +166,8 @@
 
         this.loadingIndicator.innerHTML = 'done';
 
+        this.drawData(this.eigenvalues, this.canvasEigenface);
+
         var hash = window.location.hash.replace(/^#/, '') || 'application';
         document.body.className = hash;
         window.location.hash = hash;

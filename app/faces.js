@@ -1,8 +1,7 @@
 /*jslint white: true, devel: true, onevar: false, undef: true, nomen: false,
   regexp: true, plusplus: false, bitwise: true, newcap: true, maxerr: 50,
   indent: 4 */
-/*global window: false, document: false, XMLHttpRequest: false,
-  algebralib: false, numeric: false */
+/*global window: false, document: false, XMLHttpRequest: false */
 
 (function () {
 
@@ -45,16 +44,30 @@
         this.controls = document.querySelector('.controls');
         this.loadingIndicator = document.getElementById('loading-indicator');
         this.csvURL = '../data/data.csv';
+        this.eigenvaluesURL = '../data/eigenvalues.json';
         this.init();
     };
 
     // Initialize data for the instance
     Faces.prototype.init = function () {
         var that = this;
-        this.loadingIndicator.innerHTML = 'fetching CSV data...';
-        this.fetchCSV(function (response) {
+        this.loadingIndicator.innerHTML = 'fetching data...';
+        var fetched = 0;
+        fetch(this.csvURL, function (response) {
+            log('fetched CSV data');
             that.imageData = that.parse(response);
-            that.start();
+            fetched++;
+            if (fetched === 2) {
+                that.start();
+            }
+        });
+        fetch(this.eigenvaluesURL, function (response) {
+            log('fetched eigenvalues json data');
+            that.eigenvalues = JSON.parse(response);
+            fetched++;
+            if (fetched === 2) {
+                that.start();
+            }
         });
     };
 
@@ -91,62 +104,6 @@
             });
         });
         return data;
-    };
-
-    // Collect a large matrix from the individual data matrices
-    Faces.prototype.collectMatrix = function (data) {
-        var matrix = [];
-        data.forEach(function (chunk) {
-            matrix.push(algebralib.flatten(chunk));
-        });
-        return matrix;
-    };
-
-    Faces.prototype.pca = function (data) {
-        var numRows = data.length;
-        var numColumns = data[0].length;
-
-        log('PCA for matrix with', numRows, 'rows and', numColumns, 'columns');
-
-        // a. remove averages from each dimension
-
-        // TODO: check this?!
-
-        data = algebralib.transpose(data);
-        var averages = data.map(function (row) {
-            return algebralib.avg(row);
-        });
-        var averageMatrix = data.map(function (row, rowIndex) {
-            // take out the row average from each cell of the row
-            return row.map(function (cell) {
-                return cell - averages[rowIndex];
-            });
-        });
-        averageMatrix = algebralib.transpose(averageMatrix);
-
-        // b. calculate covariance matrix
-
-        var multiplied = algebralib.multiply(averageMatrix,
-                                             algebralib.transpose(averageMatrix));
-        var covmatrix = multiplied.map(function (row) {
-            return row.map(function (cell) {
-                return cell / numRows;
-            });
-        });
-
-        // c. calculate the eigenvectors and eigenvalues of the
-        // covariance matrix
-
-        log('calculating eigenvalues');
-        var eig;// = numeric.eig(covmatrix);
-        log('eigenvalues calculated');
-
-        return {
-            averages: averages,
-            averageMatrix: averageMatrix,
-            covmatrix: covmatrix,
-            eig: eig
-        };
     };
 
     // Draw the given data to the given canvas
@@ -207,8 +164,6 @@
     Faces.prototype.start = function () {
         this.initControls();
 
-        this.loadingIndicator.innerHTML = 'calculating PCA...';
-        this.pcaData = this.pca(algebralib.transpose(this.collectMatrix(this.imageData)));
         this.loadingIndicator.innerHTML = 'done';
 
         var hash = window.location.hash.replace(/^#/, '') || 'application';

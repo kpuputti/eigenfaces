@@ -10,6 +10,7 @@ var exec = require('child_process').exec;
 
 var PWD = process.env.PWD;
 var CSV_PATH = PWD + '/data/data.csv';
+var AVGDATA_FILE = PWD + '/data/avgdata.json';
 var EIGENVALUES_FILE = PWD + '/data/eigenvalues.json';
 
 var start = Date.now();
@@ -53,14 +54,16 @@ var getMatrix = function (csv) {
         return underscore.flatten(chunk);
     });
     var matrix = sylvester.Matrix.create(scanned);
-    return matrix.transpose();
+    return matrix;
 };
 
 var calculateEigenvalues = function (covmatrixFile, callback) {
     log('calculating eigenvalues from file: ' + covmatrixFile);
     var cmd = 'python eigvals.py ' + covmatrixFile;
     log('running command: ' + cmd);
-    exec(cmd, function (err, stdout, stderr) {
+    exec(cmd, {
+        maxBuffer: 5000 * 1024
+    }, function (err, stdout, stderr) {
         if (err) {
             throw err;
         }
@@ -71,9 +74,8 @@ var calculateEigenvalues = function (covmatrixFile, callback) {
 var writeCovMatrix = function (matrix, callback) {
     log('calculating covmatrix');
 
-    // TODO: some missing pieces here
-
-    var covmatrix = matrix.x(matrix.transpose());
+    var dims = matrix.dimensions();
+    var covmatrix = matrix.transpose().x(matrix).x(1 / dims.rows);
     var covdims = covmatrix.dimensions();
     log('covmatrix with ' + covdims.rows + ' rows and ' +
         covdims.cols + ' columns');
@@ -91,22 +93,26 @@ var writeCovMatrix = function (matrix, callback) {
 };
 
 var getAvgMatrix = function (matrix) {
-    var averages = matrix.toArray().map(function (row) {
-        return avg(row);
+    var mean = matrix.transpose().toArray().map(function (column) {
+        return avg(column);
     });
-    var avgMatrix = matrix.toArray().map(function (row, rowIndex) {
-        // take out the row average from each cell of the row
-        return row.map(function (cell) {
-            return cell - averages[rowIndex];
+    var avgMatrix = matrix.toArray().map(function (row) {
+        return row.map(function (cell, j) {
+            return cell - mean[j];
         });
     });
-    return sylvester.Matrix.create(avgMatrix);
+    return {
+        mean: mean,
+        avgMatrix: sylvester.Matrix.create(avgMatrix)
+    };
 };
 
 var saveEigenvalues = function (covMatrixFile, eigfile, callback) {
-    calculateEigenvalues(covMatrixFile, function (eigvals) {
-        log('got ' + eigvals.length + ' eigenvalues');
-        var eigData = JSON.stringify(eigvals);
+    calculateEigenvalues(covMatrixFile, function (data) {
+        log('got ' + data.eigenvalues.length + ' eigenvalues and ' +
+            data.eigenvectors.length + ' eigenvectors');
+
+        var eigData = JSON.stringify(data);
         fs.writeFile(eigfile, eigData, function (err) {
             if (err) {
                 throw err;
@@ -116,23 +122,45 @@ var saveEigenvalues = function (covMatrixFile, eigfile, callback) {
     });
 };
 
+var writeAvgData = function (avgData, callback) {
+    log('saving avg data to file: ' + AVGDATA_FILE);
+    var data = JSON.stringify({
+        mean: avgData.mean,
+        avgMatrix: avgData.avgMatrix.toArray()
+    });
+    fs.writeFile(AVGDATA_FILE, data, function (err) {
+        if (err) {
+            throw err;
+        }
+        callback();
+    });
+};
+
 var savePCAData = function (matrix, callback) {
+
     // a. remove averages from each dimension
 
-    // TODO: check this, something weird happening here
+    var avgData = getAvgMatrix(matrix);
 
-    var avgMatrix = getAvgMatrix(matrix);
+    var avgMatrix = avgData.avgMatrix;
+    var dims = avgMatrix.dimensions();
+    log('calculated avg matrix with ' + dims.rows + ' rows and ' +
+        dims.cols + ' columns');
 
-    // b. calculate covariance matrix
-    writeCovMatrix(avgMatrix, function (covMatrixFile) {
+    writeAvgData(avgData, function () {
 
-        // c. calculate the eigenvectors and eigenvalues of the
-        // covariance matrix
+        // b. calculate covariance matrix
 
-        var eigfile = EIGENVALUES_FILE;
-        saveEigenvalues(covMatrixFile, eigfile, function () {
-            log('saved eigenvalues to file: ' + eigfile);
-            callback();
+        writeCovMatrix(avgMatrix, function (covMatrixFile) {
+
+            // c. calculate the eigenvectors and eigenvalues of the
+            // covariance matrix
+
+            var eigfile = EIGENVALUES_FILE;
+            saveEigenvalues(covMatrixFile, eigfile, function () {
+                log('saved eigenvalues to file: ' + eigfile);
+                callback();
+            });
         });
     });
 };

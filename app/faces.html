@@ -23,7 +23,7 @@
 
       <article id="application">
 
-        <section class="controls">
+        <section class="controls hidden">
           <p>Selected image:
             <select class="data-selector" autofocus>
               <option value="">none</option>
@@ -33,14 +33,24 @@
 
         <ul class="canvas-list">
           <li>
-            <span>Eigenface:</span>
-            <canvas class="eigenface" width="95" height="95"></canvas>
+            <span>Mean:</span>
+            <canvas class="mean" width="95" height="95"></canvas>
           </li>
-          <li>
+          <li class="hidden">
             <span>Original:</span>
             <canvas class="original" width="95" height="95"></canvas>
           </li>
+          <li  class="hidden">
+            <span>Eigenface:</span>
+            <canvas class="eigenface" width="95" height="95"></canvas>
+          </li>
         </ul>
+
+        <p>Original images:</p>
+        <canvas class="originals"></canvas>
+
+        <p>Eigenfaces:</p>
+        <canvas class="eigenfaces"></canvas>
 
       </article>
 
@@ -50,12 +60,12 @@
 
     </div>
 
-    <script src="lib/numeric-1.0.2.min.js"></script>
-    <script src="algebralib.js"></script>
+    <script src="lib/underscore-1.3.3.min.js"></script>
+    <script src="lib/sylvester-min.js"></script>
     <script src="faces.js"></script>
     <script>
       window.onload = function () {
-        window.faces = new Faces();
+      window.faces = new Faces();
       };
     </script>
   </body>

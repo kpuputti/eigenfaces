@@ -27,6 +27,9 @@ h1 {
 p {
     margin: 1em 0;
 }
+.hidden {
+    display: none;
+}
 
 /* Content containers */
 #container {
@@ -139,6 +142,10 @@ article h1 {
 }
 
 /* Application*/
+.canvas-list {
+    width: 100%;
+    overflow: hidden;
+}
 .canvas-list li {
     width: 95px;
     margin-right: 10px;

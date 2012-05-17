@@ -280,7 +280,9 @@
         window.location.hash = hash;
         window.addEventListener('hashchange', function () {
             document.body.className = window.location.hash.replace(/^#/, '');
+            document.body.scrollTop = 0;
         }, false);
+        document.body.scrollTop = 0;
 
         var elapsed = Date.now() - this.startTime;
         log('Faces ready in', elapsed, 'ms');

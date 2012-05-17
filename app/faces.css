@@ -20,7 +20,8 @@ body {
 }
 h1 {
     font-family: Georgia, serif;
-    font-size: 24px;
+    font-size: 24px !important;
+    line-height: 24px !important;
     margin: 10px 10px 10px 20px;
     color: #ccc;
 }
@@ -135,9 +136,10 @@ article h1 {
     position: absolute;
     top: 50px;
     right: 10px;
-    font-size: 14px;
+    font-size: 14px !important;
+    line-height: 14px !important;
     font-style: italic;
-    margin: 0;
+    margin: 0 !important;
     color: #999;
 }
 
@@ -167,9 +169,31 @@ article h1 {
 }
 
 /* Documentation */
+.documentation {
+    line-height: 1.4em;
+}
+.documentation h2 {
+    margin: 1em 0;
+    border-bottom: 1px solid #ddd;
+}
 .documentation p {
     margin: 1em 0;
 }
-.documentation .author {
-    margin: 0;
+.documentation li {
+    margin-left: 2em;
+}
+.documentation ul.tools {
+    margin: 1em 0;
+}
+.documentation ul.tools li {
+    list-style-type: square;
+    margin-bottom: 1em;
+}
+.documentation ol.app-steps li {
+    list-style-type: lower-roman;
+    margin-bottom: 1em;
+}
+.documentation pre {
+    font-size: 12px;
+    line-height: 12px;
 }

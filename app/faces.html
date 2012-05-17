@@ -55,7 +55,143 @@
       </article>
 
       <article id="documentation">
-        <p>documentation here</p>
+
+        <p>Principal Component Analysis (PCA) and eigenfaces in
+        JavaScript (and a little Python).</p>
+
+        <h2>Tools and libraries used in the work</h2>
+
+        <ul class="tools">
+          <li><a href="http://nodejs.org/">Node.js</a> for running
+          JavaScript in the command line</li>
+          <li><a href="http://sylvester.jcoglan.com/">Sylvester</a>
+          for matrix manipulation in JavaScript</li>
+          <li><a href="http://underscorejs.org/">Underscore.js</a> for
+          functional programming style array manipulation in
+          JavaScript</li>
+          <li>The lineal algebra module <code>linealg</code>
+          of <a href="http://numpy.scipy.org/">NumPy</a> for
+          eigenvector and eigenvalue calculation in Python</li>
+        </ul>
+
+        <h2>Preprocessing CSV data</h2>
+        <p>
+          JavaScript performance in the browser wasn't good enough to
+          do the PCA in real-time, and I had to resort to
+          using <a href="http://nodejs.org/">node.js</a> in the
+          command line to preprocess the data.
+        </p>
+        <p>
+          Also, calculating the eigenvectors and eigenvalues wasn't
+          possible for the large covariance matrix even with node.js
+          (I waited several hours for the matrix library to calculate
+          them, but could not get any results).
+        </p>
+        <p>
+          This is why I had to use Python and
+          the <a href="http://numpy.scipy.org/">NumPy</a> package to
+          calculate the eigenvectors and the eigenvalues of the
+          covariance matrix.
+        </p>
+        <p>The PCA calculation and the resulting images can be seen by
+        doing the following:</p>
+        <ol class="app-steps">
+          <li>
+            <p>Run <code>node eigen.js</code> in the command line</p>
+
+            <p>This parses the CSV data, calculates the PCA, and
+            outputs the average matrix, covariance matrix, the
+            eigenvectors, and the eigenvalues to JSON files that can
+            be used in the app frontend.</p>
+
+            <p>The eigenvectors are calculated by saving the
+            covariance matrix to a json file and calling the Python
+            script <code>python [covmatrixfile]</code> (from
+            the <code>eigen.js</code> script) to output the
+            eigenvectors and eigenvalues. These are then read from the
+            standard output back to the <code>eigen.js</code>
+            script.</p>
+
+            <p>Example log from the script:</p>
+
+            <pre><code>
+$ node eigen.js
+reading CSV file: /home/kpup/dev/eigenfaces/data/data.csv
+read 125445 chars of data
+parsed 96 image matrices with dimensions 19x19
+parsed matrix with 96 rows and 361 columns
+calculated avg matrix with 96 rows and 361 columns
+saving avg data to file: /home/kpup/dev/eigenfaces/data/avgdata.json
+calculating covmatrix
+covmatrix with 361 rows and 361 columns
+writing output json file: /home/kpup/dev/eigenfaces/tmp/covmatrix.json
+calculating eigenvalues from file: /home/kpup/dev/eigenfaces/tmp/covmatrix.json
+running command: python eigvals.py /home/kpup/dev/eigenfaces/tmp/covmatrix.json
+got 361 eigenvalues and 361 eigenvectors
+saved eigenvalues to file: /home/kpup/dev/eigenfaces/data/eigenvalues.json
+ready in 2325ms
+            </code></pre>
+          </li>
+          <li>
+            <p>Open the <code>app/faces.html</code> in a browser</p>
+
+            <p>Note that the HTML file cannot be opened as a normal
+            HTML page since it uses Ajax to fetch the data files and
+            HTTP requests using Ajax are not allowed with
+            the <code>file://</code> protocol because of the
+            cross-origin policy in browsers. This can be solved by
+            opening the browser with a command line flag to disable
+            the cross-origin policy
+            (<code>--disable-web-security</code> in Chrome/Chromium)
+            or to open the file with the <code>http://</code> protocol
+            using a web server.</p>
+
+            <p>For convenience, I have uploaded the app here for
+            testing: <a href="http://kpuputti.github.com/eigenfaces/app/faces.html">app/faces.html</a></p>
+
+            <p>Note that it might take time to initialize the
+            app. Example log from the frontend:</p>
+
+            <pre><code>
+1337248518726 Faces: fetching data from url: ../data/data.csv
+1337248518743 Faces: fetched CSV data
+1337248518744 Faces: parsing CSV text with length: 125445
+1337248518749 Faces: parsed 96 chunks
+1337248518789 Faces: fetching data from url: ../data/eigenvalues.json
+1337248518913 Faces: fetched 361 eigenvalues and 361 eigenvectors
+1337248518913 Faces: fetching data from url: ../data/avgdata.json
+1337248518951 Faces: initializing controls
+1337248519326 Faces: Faces ready in 601 ms
+            </code></pre>
+
+            <p>The frontend downloads and parses the original CSV file
+            and the preprocessed json files and then draws the
+            original images, the mean image, and the eigenfaces to a
+            canvas.</p>
+          </li>
+        </ol>
+
+        <h2>Results</h2>
+
+        <p>The results can be seen in
+        the <a href="#application">Application</a> tab.</p>
+
+        <p>As we see, the original images and the mean image look
+        fine, but the resulting eigenfaces are not correct. The top
+        part of the first few rows of the eigenfaces looks correct,
+        but the rest of the images are blurred.</p>
+
+        <p>I cannot say what the problem was, or point to where it
+        might have occurred. I tried drawing the faces is several
+        different ways to check if there was some problems with
+        drawing the matrices, but all of my other attemps ended up in
+        blurred images.</p>
+
+        <h2>Source code</h2>
+
+        <p>All the source code can be found
+        at <a href="https://github.com/kpuputti/eigenfaces">github.com/kpuputti/eigenfaces</a>.</p>
+
       </article>
 
     </div>
@@ -65,7 +201,7 @@
     <script src="faces.js"></script>
     <script>
       window.onload = function () {
-      window.faces = new Faces();
+        window.faces = new Faces();
       };
     </script>
   </body>

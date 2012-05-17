@@ -1,0 +1,175 @@
+/* Reset */
+* {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+/* General */
+html, body {
+    font-family: Helvetica, Verdana, sans-serif;
+    font-size: 18px;
+    background-color: #eee;
+    color: #777;
+}
+body {
+    overflow-y: scroll;
+}
+h1 {
+    font-family: Georgia, serif;
+    font-size: 24px;
+    margin: 10px 10px 10px 20px;
+    color: #ccc;
+}
+p {
+    margin: 1em 0;
+}
+.hidden {
+    display: none;
+}
+
+/* Content containers */
+#container {
+    position: relative;
+    width: 800px;
+    margin: 10px auto;
+    -moz-transition: all 1s;
+    -webkit-transition: all 1s;
+    -ms-transition: all 1s;
+    -o-transition: all 1s;
+    transition: all 1s;
+}
+article {
+    min-height: 500px;
+    display: none;
+    padding: 10px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+/* Navigation */
+nav {
+    padding-left: 20px;
+    height: 30px;
+}
+nav li {
+    float: left;
+    width: 200px;
+    height: 30px;
+    margin-right: 10px;
+    line-height: 30px;
+    font-size: 14px;
+    text-align: center;
+}
+nav a {
+    display: block;
+    background-color: #ddd;
+    color: #666;
+    text-decoration: none;
+    border: 1px solid #ddd;
+    border-bottom: 1px solid #fff;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+    -webkit-transition-property: background-color;
+    -moz-transition-property: background-color;
+    -ms-transition-property: background-color;
+    -o-transition-property: background-color;
+    transition-property: background-color;
+
+    -webkit-transition-duration: 0.3s;
+    -moz-transition-duration: 0.3s;
+    -ms-transition-duration: 0.3s;
+    -o-transition-duration: 0.3s;
+    transition-duration: 0.3s;
+}
+nav a:hover {
+    background-color: #eee;
+}
+.application a[href="#application"],
+.documentation a[href="#documentation"] {
+    background-color: #fff;
+}
+
+/* Loading and content visibility */
+#loading-indicator {
+    display: none;
+    margin: 50px auto 0 auto;
+    padding: 7px 0 0 40px;
+    font-size: 14px;
+    width: 300px;
+    height: 32px;
+    color: #666;
+    background: url(loading.gif) no-repeat;
+}
+.loading #loading-indicator {
+    display: block;
+}
+.loading #container {
+    opacity: 0;
+}
+.application #application,
+.documentation #documentation {
+    opacity: 1;
+    display: block;
+}
+
+/* General content */
+article h1 {
+    font-size: 32px;
+    color: #666;
+    margin: 0;
+    padding: 10px 0;
+}
+.author {
+    position: absolute;
+    top: 50px;
+    right: 10px;
+    font-size: 14px;
+    font-style: italic;
+    margin: 0;
+    color: #999;
+}
+
+/* Application*/
+.canvas-list {
+    width: 100%;
+    overflow: hidden;
+}
+.canvas-list li {
+    width: 95px;
+    margin-right: 10px;
+    float: left;
+    text-align: center;
+}
+.canvas-list span {
+    font-size: 14px;
+    margin-bottom: 2px;
+}
+.application canvas {
+    background-color: #eee;
+}
+.application .controls {
+    margin-bottom: 5px;
+}
+.application select {
+    margin: 0;
+}
+
+/* Documentation */
+.documentation p {
+    margin: 1em 0;
+}
+.documentation .author {
+    margin: 0;
+}
